@@ -44,26 +44,62 @@
       height: auto;
       border-radius: 10px;
     }
+    #pendulum {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 300px;
+      background-color: white;
+      border-radius: 50%;
+      animation: swing 2s infinite linear;
+      z-index: 20;
+    }
+    #pendulum:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 2px;
+      height: 200px;
+      background-color: white;
+      transform-origin: top center;
+    }
+    @keyframes swing {
+      0% {
+        transform: rotate(-45deg);
+      }
+      50% {
+        transform: rotate(45deg);
+      }
+      100% {
+        transform: rotate(-45deg);
+      }
+    }
   </style>
 </head>
 <body>
 
   <div id="main-timer">01:00</div>
   <img id="cat-img" src="https://github.com/maxidamp3/Cat/blob/main/Cat.png?raw=true" alt="Котёнок">
+  <div id="pendulum"></div>
 
   <script>
     let countdown = 60; // 1 минута
     let mainTimer = document.getElementById("main-timer");
     let catImg = document.getElementById("cat-img");
-    let smallTimers = [];
+    let pendulum = document.getElementById("pendulum");
     let body = document.body;
+    let smallTimers = [];
     let backgroundTransitionDuration = 60; // Таймер на 60 секунд
+    let tickTockIndex = 0; // Индекс для чередования "tick" и "tock"
 
-    // Создание маленьких таймеров
-    function createSmallTimer() {
+    // Создание маленьких таймеров с "tick" и "tock"
+    function createSmallTickTock() {
       let timer = document.createElement("div");
       timer.classList.add("small-timer");
-      timer.innerText = "00:00";
+      timer.innerText = tickTockIndex % 2 === 0 ? "tick" : "tock";
       document.body.appendChild(timer);
 
       let x = Math.random() * window.innerWidth;
@@ -72,33 +108,26 @@
       timer.style.left = `${x}px`;
       timer.style.top = `${y}px`;
 
+      tickTockIndex++; // Переходим к следующему слову ("tick" или "tock")
+
       // Анимация движения таймера
       let moveX = Math.random() * 2 - 1; // Направление по оси X
       let moveY = Math.random() * 2 - 1; // Направление по оси Y
-      let smallCountdown = 5;
       
+      // Двигаем таймер
       let smallInterval = setInterval(() => {
-        if (smallCountdown > 0) {
-          let sec = String(smallCountdown).padStart(2, '0');
-          timer.innerText = `00:${sec}`;
-          smallCountdown--;
-          
-          // Двигаем таймер
-          x += moveX;
-          y += moveY;
+        x += moveX;
+        y += moveY;
 
-          // Останавливаем движение, если таймер выходит за пределы экрана
-          if (x < 0 || x > window.innerWidth || y < 0 || y > window.innerHeight) {
-            moveX = -moveX;
-            moveY = -moveY;
-          }
-          
-          timer.style.left = `${x}px`;
-          timer.style.top = `${y}px`;
-        } else {
-          clearInterval(smallInterval);
+        // Останавливаем движение, если таймер выходит за пределы экрана
+        if (x < 0 || x > window.innerWidth || y < 0 || y > window.innerHeight) {
+          moveX = -moveX;
+          moveY = -moveY;
         }
-      }, 200); // Таймер отсчитывает каждую 1/5 секунды (200мс)
+
+        timer.style.left = `${x}px`;
+        timer.style.top = `${y}px`;
+      }, 200); // Таймер двигается каждые 200мс
     }
 
     // Обновление основного таймера
@@ -118,13 +147,18 @@
       body.style.backgroundColor = `rgb(${redValue}, 0, 0)`; // Красный цвет постепенно усиливается
 
       if (countdown % 5 === 0) {
-        createSmallTimer();
+        createSmallTickTock();
       }
 
       if (countdown === 0) {
         clearInterval(interval);
         body.style.backgroundColor = "black"; // В конце фон резко становится чёрным
         catImg.style.display = "block"; // Показываем котёнка
+        
+        // Удаляем все маленькие таймеры и маятник после появления котёнка
+        let smallTimers = document.querySelectorAll('.small-timer');
+        smallTimers.forEach(timer => timer.remove());
+        pendulum.remove();
       }
     }, 1000); // Обновляем основной таймер каждую секунду
   </script>
