@@ -1,166 +1,25 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Таймер с эффектами</title>
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: black;
-      color: white;
-      font-family: Arial, sans-serif;
-      overflow: hidden;
-      position: relative;
-      transition: background-color 1s ease;
-    }
-    #main-timer {
-      font-size: 50px;
-      position: absolute;
-      z-index: 10;
-    }
-    .small-timer {
-      position: absolute;
-      font-size: 20px;
-      animation: fadeIn 60s linear forwards;
-    }
-    @keyframes fadeIn {
-      0% {
-        opacity: 0;
-        transform: scale(0);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-    #cat-img {
-      display: none;
-      width: 200px;
-      height: auto;
-      border-radius: 10px;
-    }
-    #pendulum {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 30px;
-      height: 300px;
-      background-color: white;
-      border-radius: 50%;
-      animation: swing 2s infinite linear;
-      z-index: 20;
-    }
-    #pendulum:before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 50%;
-      width: 2px;
-      height: 200px;
-      background-color: white;
-      transform-origin: top center;
-    }
-    @keyframes swing {
-      0% {
-        transform: rotate(-45deg);
-      }
-      50% {
-        transform: rotate(45deg);
-      }
-      100% {
-        transform: rotate(-45deg);
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cat</title>
 </head>
 <body>
+    <h1>Нажми на кота!</h1>
+    <img id="cat" src="https://raw.githubusercontent.com/maxidamp3/Cat/main/Cat.png" alt="Кот" style="cursor: pointer;">
+    
+    <audio id="meow" src="https://raw.githubusercontent.com/maxidamp3/Cat/main/meow.mp3"></audio>
 
-  <div id="main-timer">01:00</div>
-  <img id="cat-img" src="https://github.com/maxidamp3/Cat/blob/main/Cat.png?raw=true" alt="Котёнок">
-  <div id="pendulum"></div>
+    <script>
+        // Получаем элементы
+        const cat = document.getElementById("cat");
+        const meow = document.getElementById("meow");
 
-  <script>
-    let countdown = 60; // 1 минута
-    let mainTimer = document.getElementById("main-timer");
-    let catImg = document.getElementById("cat-img");
-    let pendulum = document.getElementById("pendulum");
-    let body = document.body;
-    let smallTimers = [];
-    let backgroundTransitionDuration = 60; // Таймер на 60 секунд
-    let tickTockIndex = 0; // Индекс для чередования "tick" и "tock"
-
-    // Создание маленьких таймеров с "tick" и "tock"
-    function createSmallTickTock() {
-      let timer = document.createElement("div");
-      timer.classList.add("small-timer");
-      timer.innerText = tickTockIndex % 2 === 0 ? "tick" : "tock";
-      document.body.appendChild(timer);
-
-      let x = Math.random() * window.innerWidth;
-      let y = Math.random() * window.innerHeight;
-
-      timer.style.left = `${x}px`;
-      timer.style.top = `${y}px`;
-
-      tickTockIndex++; // Переходим к следующему слову ("tick" или "tock")
-
-      // Анимация движения таймера
-      let moveX = Math.random() * 2 - 1; // Направление по оси X
-      let moveY = Math.random() * 2 - 1; // Направление по оси Y
-      
-      // Двигаем таймер
-      let smallInterval = setInterval(() => {
-        x += moveX;
-        y += moveY;
-
-        // Останавливаем движение, если таймер выходит за пределы экрана
-        if (x < 0 || x > window.innerWidth || y < 0 || y > window.innerHeight) {
-          moveX = -moveX;
-          moveY = -moveY;
-        }
-
-        timer.style.left = `${x}px`;
-        timer.style.top = `${y}px`;
-      }, 200); // Таймер двигается каждые 200мс
-    }
-
-    // Обновление основного таймера
-    function updateMainTimer() {
-      let minutes = Math.floor(countdown / 60);
-      let seconds = countdown % 60;
-      mainTimer.innerText = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }
-
-    // Основной отсчёт
-    let interval = setInterval(() => {
-      countdown--;
-      updateMainTimer();
-      
-      // Плавное изменение фона
-      let redValue = Math.floor((1 - countdown / 60) * 255);
-      body.style.backgroundColor = `rgb(${redValue}, 0, 0)`; // Красный цвет постепенно усиливается
-
-      if (countdown % 5 === 0) {
-        createSmallTickTock();
-      }
-
-      if (countdown === 0) {
-        clearInterval(interval);
-        body.style.backgroundColor = "black"; // В конце фон резко становится чёрным
-        catImg.style.display = "block"; // Показываем котёнка
-        
-        // Удаляем все маленькие таймеры и маятник после появления котёнка
-        let smallTimers = document.querySelectorAll('.small-timer');
-        smallTimers.forEach(timer => timer.remove());
-        pendulum.remove();
-      }
-    }, 1000); // Обновляем основной таймер каждую секунду
-  </script>
+        // Добавляем обработчик события на клик
+        cat.addEventListener("click", function() {
+            meow.play(); // Воспроизводим звук мяуканья
+        });
+    </script>
 </body>
 </html>
